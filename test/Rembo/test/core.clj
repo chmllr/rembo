@@ -2,5 +2,6 @@
   (:use [Rembo.core])
   (:use [clojure.test]))
 
-(deftest replace-me ;; FIXME: write
-  (is false "No tests have been written."))
+(testing "API"
+         (do (user-create "elrodeo" "asdasd" "I'm nothing" "asd@asd.de")
+         ))
