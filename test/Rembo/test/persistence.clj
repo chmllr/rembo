@@ -1,6 +1,7 @@
-(ns Rembo.test.core
-  (:use [Rembo.persistence])
-  (:use [clojure.test]))
+(ns Rembo.test.persistence
+  (:use [Rembo.test.core]
+        [Rembo.persistence]
+        [clojure.test]))
 
 (use-fixtures :once clean-datebase-fixture)
 
