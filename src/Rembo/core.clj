@@ -13,3 +13,6 @@
 
 (defn authorized? [user-id auth]
   (= auth (get-session user-id)))
+
+(defn next-id [id]
+  (str (if id (inc (Integer/parseInt id)) 0)))

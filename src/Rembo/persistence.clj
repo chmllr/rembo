@@ -44,3 +44,8 @@
   "Flushes the entire DB (should be used for tests only"
   []
   (redis/flush-all db))
+
+(defn add-to-set
+  "Extends the set of a given key by given value (no multiple values are supported)"
+  [key member]
+  (redis/sadd db key member))

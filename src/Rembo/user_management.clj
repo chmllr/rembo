@@ -6,10 +6,9 @@
 (defn user-create
   "Creates a new user"
   [name password about email]
-  (let [user-id (retrieve :last-user-id)
-        user-id (str (if user-id (inc (Integer/parseInt user-id)) 0))
+  (let [user-id (next-id (retrieve :last-user-id))
         password (digest/md5 password)
-        to-store (hash-map :name name :password password :about about :email email)]
+        to-store {:name name :password password :about about :email email}]
     (do
       (persist :last-user-id user-id)
       (persist :name2id name user-id)
@@ -35,10 +34,10 @@
 
 (defn user-update
   "Update user info"
-  [user-id auth {:keys [name password about email]}]
-  (when (authorized? user-id auth)
+  [user-id auth-token {:keys [name password about email]}]
+  (when (authorized? user-id auth-token)
     (let [password (when password (digest/md5 password)) ;hash passwd if is gonna change
-          to-store (hash-map :name name :password password :about about :email email)]
+          to-store {:name name :password password :about about :email email}]
       (do
         ; when a name will be changed, adust the name->id mapping as well!
         (when (to-store :name)
