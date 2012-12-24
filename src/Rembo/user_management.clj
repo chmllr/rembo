@@ -48,3 +48,7 @@
           (when v
             (persist :users (con user-id k) v)))))))
 
+(defn user-meta-retrieve
+  "Retrieves information about the user"
+  []
+  (throw (Exception. "Not implemented")))
