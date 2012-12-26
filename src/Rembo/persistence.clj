@@ -10,7 +10,10 @@
 ; returns the name if the given value is a keyword,
 ; or just returns the string back
 (defn- normalize [value]
-  (if (keyword? value) (name value) value))
+  (str 
+    (if (keyword? value)
+      (name value)
+      value)))
 
 (defn retrieve 
   "Retrieves the value of the given field;
@@ -27,9 +30,9 @@
   or persists the value for the given field of the specified hash key.
   If the field name of hash field is a clojure keyword, its name will be used"
   ([field value]
-   (redis/set db (normalize field) value))
+   (redis/set db (normalize field) (normalize value)))
   ([hkey field value]
-   (redis/hset db (normalize hkey) (normalize field) value)))
+   (redis/hset db (normalize hkey) (normalize field) (normalize value))))
 
 (defn delete 
   "Delete the specified value of the given field;
@@ -46,6 +49,12 @@
   (redis/flush-all db))
 
 (defn add-to-set
-  "Extends the set of a given key by given value (no multiple values are supported)"
+  "Extends the set of a given key by given value 
+  (no multiple values are supported)"
   [key member]
-  (redis/sadd db key member))
+  (redis/sadd db (normalize key) (normalize member)))
+
+(defn retrieve-set
+  "Retrieves a set"
+  [key]
+  (redis/smembers db (normalize key)))

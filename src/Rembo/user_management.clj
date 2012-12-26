@@ -44,7 +44,7 @@
         (when (to-store :name)
           (do 
             (delete :name2id ((user-retrieve user-id) :name))
-            (persist :name2id name (str user-id))))
+            (persist :name2id name user-id)))
         (doseq [[k v] to-store]
           (when v
             (persist :users (con user-id k) v)))))))

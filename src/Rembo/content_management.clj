@@ -7,7 +7,7 @@
   [user-id auth-token message parent-message-id anonymous]
   (when (authorized? user-id auth-token)
     (let [message-id (next-id (retrieve :last-message-id))
-          created (str (int (/ (System/currentTimeMillis) 1000)))
+          created (int (/ (System/currentTimeMillis) 1000))
           to-store {:message message 
                     :created created
                     :updated created
@@ -28,12 +28,13 @@
   (let [info (reduce 
                       #(assoc %1 %2 (retrieve :messages (con message-id %2))) 
                       {} 
-                      [:message :parent :created :updated :author :visible
-                       :anonymous])
-        info (if (info :anonymous) (dissoc info :author) info)
-        info (dissoc info :author)
+                          [:message :parent :created :updated :author :visible
+                           :anonymous])
+        info (if (Boolean/valueOf (info :anonymous)) 
+               (dissoc info :author) info)
+        info (dissoc info :anonymous)
         visible (info :visible)
         info (dissoc info :visible)
-        info (assoc info :children (retrieve (con message-id :children)))
-        info (assoc info :upvotes (retrieve (con message-id :upvotes)))]
+        info (assoc info :children (retrieve-set (con message-id :children)))
+        info (assoc info :upvotes (retrieve-set (con message-id :upvotes)))]
     (when visible info)))

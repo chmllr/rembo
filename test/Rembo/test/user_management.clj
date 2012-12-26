@@ -20,7 +20,9 @@
                   (isnot (= nil auth))
                   (user-update 1 auth {:name "lol"})
                   (is (= "lol" ((user-retrieve 1) :name)))
-                  (user-update 1 auth {:name "chris" :about "just a user" :email "chr@is.com"})
+                  (user-update 1 auth {:name "chris"
+                                       :about "just a user"
+                                       :email "chr@is.com"})
                   (is (= "chris" ((user-retrieve 1) :name)))
                   (is (= "just a user" ((user-retrieve 1) :about)))
                   (is (= "chr@is.com" ((user-retrieve 1) :email)))

@@ -11,4 +11,11 @@
                   (def auth (user-authenticate "cm" "asdasd"))
                   (def message-id
                     (message-create 0 auth "test message" :MAIN-PAGE false))
-                  (is (= 0 message-id))))
+                  (is (= 0 message-id))
+                  (def message (message-retrieve 0))
+                  (is (= (message :message) "test message"))
+                  (is (= (message :parent) "MAIN-PAGE"))
+                  (is (= (message :created) (message :updated))) 
+                  (is (= (message :author) "0"))
+
+                  ))

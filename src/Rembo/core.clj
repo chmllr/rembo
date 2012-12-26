@@ -15,4 +15,4 @@
   (= auth (get-session user-id)))
 
 (defn next-id [id]
-  (str (if id (inc (Integer/parseInt id)) 0)))
+  (if id (inc (Integer/parseInt id)) 0))
