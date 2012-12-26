@@ -36,7 +36,8 @@
   "Update user info"
   [user-id auth-token {:keys [name password about email]}]
   (when (authorized? user-id auth-token)
-    (let [password (when password (digest/md5 password)) ;hash passwd if is gonna change
+          ;hash passwd if it's gonna change
+    (let [password (when password (digest/md5 password)) 
           to-store {:name name :password password :about about :email email}]
       (do
         ; when a name will be changed, adust the name->id mapping as well!

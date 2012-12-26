@@ -7,11 +7,11 @@
   [user-id auth-token message parent-message-id anonymous]
   (when (authorized? user-id auth-token)
     (let [message-id (next-id (retrieve :last-message-id))
-          created (int (/ (System/currentTimeMillis) 1000))
+          created (str (int (/ (System/currentTimeMillis) 1000)))
           to-store {:message message 
                     :created created
                     :updated created
-                    :author user-id
+                    :author (str user-id)
                     :parent parent-message-id
                     :visible true
                     :anonymous anonymous}]
@@ -19,7 +19,8 @@
         (persist :last-message-id message-id)
         (add-to-set (con message-id :children) message-id)
         (doseq [[k v] to-store]
-          (persist :messages (con message-id k) v))))))
+          (persist :messages (con message-id k) v))
+        message-id))))
 
 (defn message-retrieve
   "Retrieves message infromation"
@@ -27,7 +28,8 @@
   (let [info (reduce 
                       #(assoc %1 %2 (retrieve :messages (con message-id %2))) 
                       {} 
-                      [:message :parent :created :updated :author :visible :anonymous])
+                      [:message :parent :created :updated :author :visible
+                       :anonymous])
         info (if (info :anonymous) (dissoc info :author) info)
         info (dissoc info :author)
         visible (info :visible)
