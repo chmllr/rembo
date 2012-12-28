@@ -26,10 +26,10 @@
   "Retrieves message infromation"
   [message-id]
   (let [info (reduce 
-                      #(assoc %1 %2 (retrieve :messages (con message-id %2))) 
-                      {} 
-                          [:message :parent :created :updated :author :visible
-                           :anonymous])
+               #(assoc %1 %2 (retrieve :messages (con message-id %2))) 
+               {} 
+               [:message :parent :created :updated :author :visible
+                :anonymous])
         info (if (Boolean/valueOf (info :anonymous)) 
                (dissoc info :author) info)
         info (dissoc info :anonymous)
@@ -37,7 +37,7 @@
         info (dissoc info :visible)
         info (assoc info :children (retrieve-set (con message-id :children)))
         info (assoc info :upvotes (retrieve-set (con message-id :upvotes)))]
-    (when visible info)))
+    (when (Boolean/valueOf visible) info)))
 
 (defn message-update
   "Update message content or visibility"
@@ -45,5 +45,5 @@
   (when (authorized? user-id auth-token)
     (let [to-store {:message message :visible visible}]
       (doseq [[k v] to-store]
-        (when v
+        (when (not (= nil v))
           (persist :messages (con message-id k) v))))))
