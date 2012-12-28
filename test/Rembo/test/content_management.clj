@@ -5,17 +5,24 @@
         [Rembo.test.core]
         [clojure.test]))
 
+(use-fixtures :once clean-datebase-fixture)
+
+(defn- create-testuser []
+  (do
+    (user-create "cm" "asdasd" "" "")
+    (user-authenticate "cm" "asdasd")))
+
+(defn- create-testmessage [{:keys [user-id auth-token]}]
+  (message-create user-id auth-token "test message" :MAIN-PAGE false))
+
 (deftest content-management
          (testing "message creation"
-                  (user-create "cm" "asdasd" "" "")
-                  (def auth (user-authenticate "cm" "asdasd"))
-                  (def message-id
-                    (message-create 0 auth "test message" :MAIN-PAGE false))
-                  (is (= 0 message-id))
+                  (is (= 0 (create-testmessage (create-testuser))))
                   (def message (message-retrieve 0))
                   (is (= (message :message) "test message"))
                   (is (= (message :parent) "MAIN-PAGE"))
                   (is (= (message :created) (message :updated))) 
-                  (is (= (message :author) "0"))
-
+                  (is (= (message :author) "0")))
+         (testing "message update"
+                  (def message-id (create-testmessage (create-testuser)))
                   ))

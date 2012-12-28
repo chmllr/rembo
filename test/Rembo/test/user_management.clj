@@ -4,6 +4,8 @@
         [Rembo.test.core]
         [clojure.test]))
 
+(use-fixtures :once clean-datebase-fixture)
+
 (deftest user-management
          (testing "user creation"
                   (user-create "elrodeo" "asdasd" "I'm nothing" "asd@asd.de")
@@ -16,21 +18,24 @@
                   (isnot (= nil (user-authenticate "elrodeo" "asdasd"))))
          (testing "user info update"
                   (user-create "cm" "12345" "software engineer" "cm@asd.de")
-                  (def auth (user-authenticate "cm" "12345"))
+                  (def authenticated-user (user-authenticate "cm" "12345"))
+                  (def auth (authenticated-user :auth-token))
+                  (def user-id (authenticated-user :user-id))
+                  (is (= "1" user-id))
                   (isnot (= nil auth))
-                  (user-update 1 auth {:name "lol"})
-                  (is (= "lol" ((user-retrieve 1) :name)))
-                  (user-update 1 auth {:name "chris"
+                  (user-update user-id auth {:name "lol"})
+                  (is (= "lol" ((user-retrieve user-id) :name)))
+                  (user-update user-id auth {:name "chris"
                                        :about "just a user"
                                        :email "chr@is.com"})
-                  (is (= "chris" ((user-retrieve 1) :name)))
-                  (is (= "just a user" ((user-retrieve 1) :about)))
-                  (is (= "chr@is.com" ((user-retrieve 1) :email)))
-                  (user-update 1 auth {:password "lalala" :name "mllr"})
-                  (is (= "mllr" ((user-retrieve 1) :name)))
-                  (user-update 1 auth {:name "chris"})
-                  (isnot (= "chris" ((user-retrieve 1) :name)))
-                  (def auth (user-authenticate "mllr" "lalala"))
+                  (is (= "chris" ((user-retrieve user-id) :name)))
+                  (is (= "just a user" ((user-retrieve user-id) :about)))
+                  (is (= "chr@is.com" ((user-retrieve user-id) :email)))
+                  (user-update user-id auth {:password "lalala" :name "mllr"})
+                  (is (= "mllr" ((user-retrieve user-id) :name)))
+                  (user-update user-id auth {:name "chris"})
+                  (isnot (= "chris" ((user-retrieve user-id) :name)))
+                  (def auth (:auth-token (user-authenticate "mllr" "lalala")))
                   (isnot (= nil auth))
-                  (user-update 1 auth {:name "chris"})
-                  (is (= "chris" ((user-retrieve 1) :name)))))
+                  (user-update user-id auth {:name "chris"})
+                  (is (= "chris" ((user-retrieve user-id) :name)))))

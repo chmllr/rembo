@@ -38,3 +38,12 @@
         info (assoc info :children (retrieve-set (con message-id :children)))
         info (assoc info :upvotes (retrieve-set (con message-id :upvotes)))]
     (when visible info)))
+
+(defn message-update
+  "Update message content or visibility"
+  [message-id user-id auth-token {:keys [message visible]}]
+  (when (authorized? user-id auth-token)
+    (let [to-store {:message message :visible visible}]
+      (doseq [[k v] to-store]
+        (when v
+          (persist :messages (con message-id k) v))))))

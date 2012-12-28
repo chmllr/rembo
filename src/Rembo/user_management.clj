@@ -30,7 +30,8 @@
         password (digest/md5 password)
         stored-password (retrieve :users (con user-id :password))]
     (when (= password stored-password)
-      (get-session user-id))))
+      { :user-id user-id
+        :auth-token (get-session user-id) })))
 
 (defn user-update
   "Update user info"
