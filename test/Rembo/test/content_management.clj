@@ -25,4 +25,10 @@
                   (is (= (message :author) "0")))
          (testing "message update"
                   (def message-id (create-testmessage (create-testuser)))
-                  ))
+                  (def user-info (user-authenticate "cm" "asdasd"))
+                  (message-update message-id (user-info :user-id)
+                                  (user-info :auth-token)
+                                  {:message "hello world"})
+                  (def message (message-retrieve 1))
+                  (isnot (= (message :message) "test message"))
+                  (is (= (message :message) "hello world"))))
