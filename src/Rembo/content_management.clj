@@ -17,7 +17,7 @@
                     :anonymous anonymous}]
       (do
         (persist :last-message-id message-id)
-        (add-to-set (con message-id :children) message-id)
+        (add-to-set (con parent-message-id :children) message-id)
         (doseq [[k v] to-store]
           (persist :messages (con message-id k) v))
         message-id))))
@@ -47,3 +47,9 @@
       (doseq [[k v] to-store]
         (when (not (= nil v))
           (persist :messages (con message-id k) v))))))
+
+(defn message-upvote
+  "Upvotes the message"
+  [message-id user-id auth-token]
+  (when (authorized? user-id auth-token)
+    (add-to-set (con message-id :upvotes) user-id)))
