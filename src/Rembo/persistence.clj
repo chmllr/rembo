@@ -57,4 +57,4 @@
 (defn retrieve-set
   "Retrieves a set"
   [key]
-  (redis/smembers db (normalize key)))
+  (set (redis/smembers db (normalize key))))

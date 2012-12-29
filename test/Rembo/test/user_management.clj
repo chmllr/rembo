@@ -9,12 +9,16 @@
 (deftest user-management
          (testing "user creation"
                   (user-create "elrodeo" "asdasd" "I'm nothing" "asd@asd.de")
+                  (is (thrown? IllegalArgumentException
+                               (user-create "elrodeo" "asdasd"
+                                            "I'm nothing" "asd@asd.de")))
                   (is (= "0" (retrieve :name2id "elrodeo")))
                   (is (= "elrodeo" ((user-retrieve 0) :name)))
                   (is (= "I'm nothing" ((user-retrieve 0) :about)))
                   (is (= "asd@asd.de" ((user-retrieve 0) :email))))
          (testing "user authentication"
-                  (is (= nil (user-authenticate "elrodeo" "asdasdasd")))
+                  (is (thrown? IllegalArgumentException 
+                               (user-authenticate "elrodeo" "asdasdasd")))
                   (isnot (= nil (user-authenticate "elrodeo" "asdasd"))))
          (testing "user info update"
                   (user-create "cm" "12345" "software engineer" "cm@asd.de")

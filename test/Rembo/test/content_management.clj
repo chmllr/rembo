@@ -7,25 +7,26 @@
 
 (use-fixtures :once clean-datebase-fixture)
 
-(defn- create-testuser []
+(defn- create-testuser [name passwd]
   (do
-    (user-create "cm" "asdasd" "" "")
-    (user-authenticate "cm" "asdasd")))
+    (user-create name passwd "" "")
+    (user-authenticate name passwd)))
 
 (defn- create-testmessage [{:keys [user-id auth-token]}]
   (message-create user-id auth-token "test message" :MAIN-PAGE false))
 
 (deftest content-management
          (testing "message creation"
-                  (is (= 0 (create-testmessage (create-testuser))))
+                  (is (= 0 (create-testmessage (create-testuser "cm" "asdasd"))))
                   (def message (message-retrieve 0))
                   (is (= (message :message) "test message"))
                   (is (= (message :parent) "MAIN-PAGE"))
                   (is (= (message :created) (message :updated))) 
                   (is (= (message :author) "0")))
          (testing "message update"
-                  (def message-id (create-testmessage (create-testuser)))
-                  (def user-info (user-authenticate "cm" "asdasd"))
+                  (def message-id (create-testmessage 
+                                    (create-testuser "cm2" "asdasd")))
+                  (def user-info (user-authenticate "cm2" "asdasd"))
                   (message-update message-id (user-info :user-id)
                                   (user-info :auth-token)
                                   {:message "hello world"})
@@ -38,7 +39,32 @@
                   (def message (message-retrieve 1))
                   (is (= (message :message) "goodbye world"))
                   (message-update message-id (user-info :user-id)
+                                  "wrong token"
+                                  {:message "empty"})
+                  (def message (message-retrieve 1))
+                  (isnot (= (message :message) "empty"))
+                  (message-update message-id (user-info :user-id)
                                   (user-info :auth-token)
                                   {:visible false})
-                  (def message2 (message-retrieve 1))
-                  (is (= nil message2))))
+                  (def message (message-retrieve 1))
+                  (is (= nil message))
+                  (message-update message-id (user-info :user-id)
+                                  (user-info :auth-token)
+                                  {:visible true})
+                  (def message (message-retrieve 1))
+                  (is (= (message :message) "goodbye world")))
+         (testing "message upvotes"
+                  (def message-id (create-testmessage 
+                                    (create-testuser "cm3" "asdasd")))
+                  (def user-info (user-authenticate "cm" "asdasd"))
+                  (def user-info2 (user-authenticate "cm2" "asdasd"))
+                  (def user-info3 (user-authenticate "cm3" "asdasd"))
+                  (message-upvote message-id (user-info :user-id)
+                                  (user-info :auth-token))
+                  (def message (message-retrieve message-id))
+                  (is (contains? (message :upvotes) (user-info :user-id)))
+                  (message-upvote message-id (user-info2 :user-id)
+                                  (user-info2 :auth-token))
+                  (def message (message-retrieve message-id))
+                  (is (contains? (message :upvotes) (user-info2 :user-id)))
+                  (isnot (contains? (message :upvotes) (user-info3 :user-id)))))

@@ -51,5 +51,5 @@
 (defn message-upvote
   "Upvotes the message"
   [message-id user-id auth-token]
-  (when (authorized? user-id auth-token)
+  (when (authorized? user-id auth-token) 
     (add-to-set (con message-id :upvotes) user-id)))
