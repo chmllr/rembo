@@ -2,12 +2,15 @@
   (:use [Rembo.core]
         [Rembo.persistence]))
 
+(defn- get-current-time []
+  (int (/ (System/currentTimeMillis) 1000)))
+
 (defn message-create
   "Creates a new message"
   [user-id auth-token message parent-message-id anonymous]
   (when (authorized? user-id auth-token)
     (let [message-id (next-id (retrieve :last-message-id))
-          created (int (/ (System/currentTimeMillis) 1000))
+          created (get-current-time)
           to-store {:message message 
                     :created created
                     :updated created
@@ -43,7 +46,9 @@
   "Update message content or visibility"
   [message-id user-id auth-token {:keys [message visible]}]
   (when (authorized? user-id auth-token)
-    (let [to-store {:message message :visible visible}]
+    (let [to-store {:message message
+                    :visible visible
+                    :updated (get-current-time)}]
       (doseq [[k v] to-store]
         (when (not (= nil v))
           (persist :messages (con message-id k) v))))))

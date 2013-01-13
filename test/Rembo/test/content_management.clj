@@ -36,12 +36,17 @@
                   (def message-id (create-testmessage 
                                     (create-testuser "cm2" "asdasd")))
                   (def user-info (user-authenticate "cm2" "asdasd"))
+                  (def creation-date (:created (message-retrieve message-id)))
+                  (is (= creation-date (:updated (message-retrieve message-id))))
+                  ; we need to delay the update by >1sec s.t. the :updated != :created
+                  (. Thread (sleep 1100))
                   (message-update message-id (user-info :user-id)
                                   (user-info :auth-token)
                                   {:message "hello world"})
                   (def message (message-retrieve message-id))
                   (isnot (= (message :message) "test message"))
                   (is (= (message :message) "hello world"))
+                  (isnot (= creation-date (:updated message)))
                   (message-update message-id (user-info :user-id)
                                   (user-info :auth-token)
                                   {:message "goodbye world"})
