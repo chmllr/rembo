@@ -3,9 +3,11 @@
         [Rembo.user-management]
         [Rembo.persistence]
         [Rembo.test.core]
+        [Rembo.core]
+        [clojure.set]
         [clojure.test]))
 
-(use-fixtures :once clean-datebase-fixture)
+(use-fixtures :once clean-database-fixture)
 
 (defn- create-testuser [name passwd]
   (do
@@ -23,6 +25,13 @@
                   (is (= (message :parent) "MAIN-PAGE"))
                   (is (= (message :created) (message :updated))) 
                   (is (= (message :author) "0")))
+         (testing "message nesting"
+                  (def new-message-id (create-testmessage (create-testuser "user" "asdasd")))
+                  (is (= (inc new-message-id) (create-testmessage (create-testuser "user2" "asdasd"))))
+                  (is (= (inc (inc new-message-id)) (create-testmessage (create-testuser "user3" "asdasd"))))
+                  (def main-page-children (retrieve-set (con :MAIN-PAGE :children)))
+                  (is (let [IDs (set (map #(str (+ new-message-id %)) [0 1 2]))]
+                        (empty? (difference IDs main-page-children)))))
          (testing "message update"
                   (def message-id (create-testmessage 
                                     (create-testuser "cm2" "asdasd")))
@@ -30,28 +39,28 @@
                   (message-update message-id (user-info :user-id)
                                   (user-info :auth-token)
                                   {:message "hello world"})
-                  (def message (message-retrieve 1))
+                  (def message (message-retrieve message-id))
                   (isnot (= (message :message) "test message"))
                   (is (= (message :message) "hello world"))
                   (message-update message-id (user-info :user-id)
                                   (user-info :auth-token)
                                   {:message "goodbye world"})
-                  (def message (message-retrieve 1))
+                  (def message (message-retrieve message-id))
                   (is (= (message :message) "goodbye world"))
                   (message-update message-id (user-info :user-id)
                                   "wrong token"
                                   {:message "empty"})
-                  (def message (message-retrieve 1))
+                  (def message (message-retrieve message-id))
                   (isnot (= (message :message) "empty"))
                   (message-update message-id (user-info :user-id)
                                   (user-info :auth-token)
                                   {:visible false})
-                  (def message (message-retrieve 1))
+                  (def message (message-retrieve message-id))
                   (is (= nil message))
                   (message-update message-id (user-info :user-id)
                                   (user-info :auth-token)
                                   {:visible true})
-                  (def message (message-retrieve 1))
+                  (def message (message-retrieve message-id))
                   (is (= (message :message) "goodbye world")))
          (testing "message upvotes"
                   (def message-id (create-testmessage 

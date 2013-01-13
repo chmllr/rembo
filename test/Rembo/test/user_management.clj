@@ -4,7 +4,7 @@
         [Rembo.test.core]
         [clojure.test]))
 
-(use-fixtures :once clean-datebase-fixture)
+(use-fixtures :once clean-database-fixture)
 
 (deftest user-management
          (testing "user creation"
@@ -42,4 +42,6 @@
                   (def auth (:auth-token (user-authenticate "mllr" "lalala")))
                   (isnot (= nil auth))
                   (user-update user-id auth {:name "chris"})
-                  (is (= "chris" ((user-retrieve user-id) :name)))))
+                  (is (= "chris" ((user-retrieve user-id) :name))))
+         (testing "meta information retrieval"
+                  (is (thrown? UnsupportedOperationException (user-meta-retrieve nil)))))

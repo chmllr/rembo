@@ -3,7 +3,7 @@
         [Rembo.persistence]
         [clojure.test]))
 
-(use-fixtures :once clean-datebase-fixture)
+(use-fixtures :once clean-database-fixture)
 
 (deftest persistence
          (testing "persistence layer"

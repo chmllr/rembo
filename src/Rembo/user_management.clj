@@ -55,5 +55,5 @@
 
 (defn user-meta-retrieve
   "Retrieves information about the user"
-  []
+  [user-id]
   (throw (UnsupportedOperationException. "Not implemented")))
