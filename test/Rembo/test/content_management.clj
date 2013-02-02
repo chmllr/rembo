@@ -14,8 +14,11 @@
     (user-create name passwd "" "")
     (user-authenticate name passwd)))
 
-(defn- create-testmessage [{:keys [user-id auth-token]}]
-  (message-create user-id auth-token "test message" :MAIN-PAGE false))
+(defn- create-testmessage 
+  ([params]
+  (create-testmessage params false))
+  ([{:keys [user-id auth-token]} anonymously]
+  (message-create user-id auth-token "test message" :MAIN-PAGE anonymously)))
 
 (deftest content-management
          (testing "message creation"
@@ -24,7 +27,10 @@
                   (is (= (message :message) "test message"))
                   (is (= (message :parent) "MAIN-PAGE"))
                   (is (= (message :created) (message :updated))) 
-                  (is (= (message :author) "0")))
+                  (is (= (message :author) "0"))
+                  (is (= 1 (create-testmessage (create-testuser "hackr" "passwd") true)))
+                  (def message (message-retrieve 1))
+                  (is (= (message :author) nil)))
          (testing "message nesting"
                   (def new-message-id (create-testmessage (create-testuser "user" "asdasd")))
                   (is (= (inc new-message-id) (create-testmessage (create-testuser "user2" "asdasd"))))

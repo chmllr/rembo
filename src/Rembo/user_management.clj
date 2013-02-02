@@ -44,7 +44,7 @@
     (let [password (when password (digest/md5 password)) 
           to-store {:name name :password password :about about :email email}]
       (do
-        ; when a name will be changed, adust the name->id mapping as well!
+        ; when a name will be changed, adjust the name->id mapping as well!
         (when (to-store :name)
           (do 
             (delete :name2id ((user-retrieve user-id) :name))
