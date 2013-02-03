@@ -1,33 +1,8 @@
-(ns Rembo.core
-  (:require [digest]
-            [cheshire.core :refer :all])
-  (:use [Rembo.persistence]
-        [Rembo.settings]))
-
-(defn con
-  "Concatenation helper"
-  [id key]
-  (str id ":" (name key)))
-
-(defn get-session
-  "Retrieves user data and creates a hash based a salt and user password"
-  [user-id]
-  (let [password (retrieve :users (con user-id :password))
-        salt (get-setting :salt)]
-    (digest/md5 (str password salt))))
-
-(defn authorized?
-  "Checks the correctness of given session token"
-  [user-id auth-token]
-  (= auth-token (get-session user-id)))
-
-(defn next-id
-  "Generates next id by incrementation"
-  [id]
-  (if id (inc (Integer/parseInt id)) 0))
+(ns Rembo.json
+  (:require [cheshire.core :refer :all]))
 
 (defn traverse
-  "Helper function for traversing arg lists of functions"
+  "Helper function for traversing argument lists of functions"
   ([f f2 coll-prepro args] (traverse f f f2 coll-prepro args))
   ([f f-in-coll f2 coll-prepro args]
    (map #(if (coll? %) 

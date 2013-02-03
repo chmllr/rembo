@@ -1,7 +1,7 @@
 (ns Rembo.test.core
   (:use [Rembo.core]
-        [Rembo.persistence])
-  (:use [clojure.test]))
+        [Rembo.persistence]
+        [clojure.test]))
 
 (defn clean-database-fixture [f]
   (flush-database)
