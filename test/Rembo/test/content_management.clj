@@ -28,16 +28,19 @@
                   (is (= (message :parent) "MAIN-PAGE"))
                   (is (= (message :created) (message :updated))) 
                   (is (= (message :author) "0"))
-                  (is (= 1 (create-testmessage (create-testuser "hackr" "passwd") true)))
+                  (is (= 1 (create-testmessage (create-testuser "hackr" "passwd") true)) 
+                      "create a new message anonymously")
                   (def message (message-retrieve 1))
-                  (is (= (message :author) nil)))
+                  (is (= (message :author) nil)) "the author shouldn't be returned")
          (testing "message nesting"
                   (def new-message-id (create-testmessage (create-testuser "user" "asdasd")))
-                  (is (= (inc new-message-id) (create-testmessage (create-testuser "user2" "asdasd"))))
+                  (is (= (inc new-message-id) (create-testmessage (create-testuser "user2" "asdasd"))) 
+                      "message id should increment")
                   (is (= (inc (inc new-message-id)) (create-testmessage (create-testuser "user3" "asdasd"))))
                   (def main-page-children (retrieve-set (con :MAIN-PAGE :children)))
                   (is (let [IDs (set (map #(str (+ new-message-id %)) [0 1 2]))]
-                        (empty? (difference IDs main-page-children)))))
+                        (empty? (difference IDs main-page-children))))
+                      "the first message id and 2 consecutive ids should be all members of the children set of the root")
          (testing "message update"
                   (def message-id (create-testmessage 
                                     (create-testuser "cm2" "asdasd")))
