@@ -28,19 +28,22 @@
 (defn message-retrieve
   "Retrieves message infromation"
   [message-id]
-  (let [info (reduce 
-               #(assoc %1 %2 (retrieve :messages (con message-id %2))) 
-               {} 
-               [:message :parent :created :updated :author :visible
-                :anonymous])
-        info (if (Boolean/valueOf (info :anonymous)) 
-               (dissoc info :author) info)
-        visible (info :visible)
-        info (merge (dissoc (dissoc info :anonymous) :visible)
-                    { :children (retrieve-set (con message-id :children))
-                     :upvotes (retrieve-set (con message-id :upvotes)) })]
-    (when (Boolean/valueOf visible) 
-      (success info))))
+  (if (retrieve :messages (con message-id :message))
+    (let [info (reduce 
+                 #(assoc %1 %2 (retrieve :messages (con message-id %2))) 
+                 {} 
+                 [:message :parent :created :updated :author :visible
+                  :anonymous])
+          info (if (Boolean/valueOf (info :anonymous)) 
+                 (dissoc info :author) info)
+          visible (info :visible)
+          info (merge (dissoc (dissoc info :anonymous) :visible)
+                      { :children (retrieve-set (con message-id :children))
+                       :upvotes (retrieve-set (con message-id :upvotes)) })]
+      (if (Boolean/valueOf visible) 
+        (success info)
+        (error "message is hidden")))
+    (error "message doesn't exist")))
 
 (defn message-update
   "Update message content or visibility"

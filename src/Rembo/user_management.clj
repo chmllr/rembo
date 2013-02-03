@@ -21,11 +21,13 @@
 (defn user-retrieve
   "Returns user info"
   [user-id]
-  (success
-    (reduce 
-      #(assoc %1 %2 (retrieve :users (con user-id %2))) 
-      {} 
-      [:name :about :email])))
+  (if (retrieve :users (con user-id :name))
+    (success
+      (reduce 
+        #(assoc %1 %2 (retrieve :users (con user-id %2))) 
+        {} 
+        [:name :about :email]))
+    (error "user doesn't exist")))
 
 (defn user-authenticate
   "Authenticates the user"
