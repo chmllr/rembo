@@ -9,39 +9,39 @@
 (deftest user-management
          (testing "user creation"
                   (user-create "elrodeo" "asdasd" "I'm nothing" "asd@asd.de")
-                  (is (thrown? IllegalArgumentException
-                               (user-create "elrodeo" "asdasd"
-                                            "I'm nothing" "asd@asd.de")))
+                  (is (= :failed (:status (user-create "elrodeo" "asdasd"
+                                            "I'm nothing" "asd@asd.de"))))
                   (is (= "0" (retrieve :name2id "elrodeo")))
-                  (is (= "elrodeo" ((user-retrieve 0) :name)))
-                  (is (= "I'm nothing" ((user-retrieve 0) :about)))
-                  (is (= "asd@asd.de" ((user-retrieve 0) :email))))
+                  (def user (:result (user-retrieve 0)))
+                  (is (= "elrodeo" (user :name)))
+                  (is (= "I'm nothing" (user :about)))
+                  (is (= "asd@asd.de" (user :email))))
          (testing "user authentication"
-                  (is (thrown? IllegalArgumentException 
-                               (user-authenticate "elrodeo" "asdasdasd")))
-                  (isnot (= nil (user-authenticate "elrodeo" "asdasd"))))
+                  (is (= :failed (:status (user-authenticate "elrodeo" "asdasdasd"))))
+                  (is (= :ok (:status (user-authenticate "elrodeo" "asdasd")))))
          (testing "user info update"
                   (user-create "cm" "12345" "software engineer" "cm@asd.de")
-                  (def authenticated-user (user-authenticate "cm" "12345"))
+                  (def authenticated-user (:result (user-authenticate "cm" "12345")))
                   (def auth (authenticated-user :auth-token))
                   (def user-id (authenticated-user :user-id))
                   (is (= "1" user-id))
                   (isnot (= nil auth))
                   (user-update user-id auth {:name "lol"})
-                  (is (= "lol" ((user-retrieve user-id) :name)))
+                  (is (= "lol" ((:result (user-retrieve user-id)) :name)))
                   (user-update user-id auth {:name "chris"
                                        :about "just a user"
                                        :email "chr@is.com"})
-                  (is (= "chris" ((user-retrieve user-id) :name)))
-                  (is (= "just a user" ((user-retrieve user-id) :about)))
-                  (is (= "chr@is.com" ((user-retrieve user-id) :email)))
+                  (def user (:result (user-retrieve user-id)))
+                  (is (= "chris" (user :name)))
+                  (is (= "just a user" (user :about)))
+                  (is (= "chr@is.com" (user :email)))
                   (user-update user-id auth {:password "lalala" :name "mllr"})
-                  (is (= "mllr" ((user-retrieve user-id) :name)))
+                  (is (= "mllr" ((:result (user-retrieve user-id)) :name)))
                   (user-update user-id auth {:name "chris"})
-                  (isnot (= "chris" ((user-retrieve user-id) :name)))
-                  (def auth (:auth-token (user-authenticate "mllr" "lalala")))
+                  (isnot (= "chris" ((:result (user-retrieve user-id)) :name)))
+                  (def auth (:auth-token (:result (user-authenticate "mllr" "lalala"))))
                   (isnot (= nil auth))
                   (user-update user-id auth {:name "chris"})
-                  (is (= "chris" ((user-retrieve user-id) :name))))
+                  (is (= "chris" ((:result (user-retrieve user-id)) :name))))
          (testing "meta information retrieval"
-                  (is (thrown? UnsupportedOperationException (user-meta-retrieve nil)))))
+                  (is (= :failed (:status (user-meta-retrieve nil))))))

@@ -10,20 +10,22 @@
         password (digest/md5 password)
         to-store {:name name :password password :about about :email email}]
     (if (retrieve :name2id name)
-      (throw (IllegalArgumentException. "user name taken"))
+      (error "user name taken")
       (do
         (persist :last-user-id user-id)
         (persist :name2id name user-id)
         (doseq [[k v] to-store]
-          (persist :users (con user-id k) v))))))
+          (persist :users (con user-id k) v))
+        (success user-id)))))
 
 (defn user-retrieve
   "Returns user info"
   [user-id]
-  (reduce 
-    #(assoc %1 %2 (retrieve :users (con user-id %2))) 
-    {} 
-    [:name :about :email]))
+  (success
+    (reduce 
+      #(assoc %1 %2 (retrieve :users (con user-id %2))) 
+      {} 
+      [:name :about :email])))
 
 (defn user-authenticate
   "Authenticates the user"
@@ -32,9 +34,9 @@
         password (digest/md5 password)
         stored-password (retrieve :users (con user-id :password))]
     (if (= password stored-password)
-      { :user-id user-id
-        :auth-token (get-session user-id) }
-      (throw (IllegalArgumentException. "username or password is wrong")))))
+      (success {:user-id user-id
+                :auth-token (get-session user-id)})
+      (error "username or password is wrong"))))
 
 (defn user-update
   "Update user info"
@@ -51,9 +53,10 @@
             (persist :name2id name user-id)))
         (doseq [[k v] to-store]
           (when v
-            (persist :users (con user-id k) v)))))))
+            (persist :users (con user-id k) v)))
+        (success true)))))
 
 (defn user-meta-retrieve
   "Retrieves information about the user"
   [user-id]
-  (throw (UnsupportedOperationException. "Not implemented")))
+  (error "method not implemented"))

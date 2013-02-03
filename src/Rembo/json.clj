@@ -1,4 +1,5 @@
 (ns Rembo.json
+  (:use [Rembo.core])
   (:require [cheshire.core :refer :all]))
 
 (defn traverse
@@ -20,5 +21,8 @@
                               #(hash-map (keyword %) (map-args# %)) 
                               #(apply merge %) identity args#)]
      (generate-string
-       (apply ~function-name func-args#))))
+       (try
+         (apply ~function-name func-args#)
+         (catch Exception e#
+           (error (.toString e#)))))))
 

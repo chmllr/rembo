@@ -23,7 +23,7 @@
         (add-to-set (con parent-message-id :children) message-id)
         (doseq [[k v] to-store]
           (persist :messages (con message-id k) v))
-        message-id))))
+        (success message-id)))))
 
 (defn message-retrieve
   "Retrieves message infromation"
@@ -38,8 +38,9 @@
         visible (info :visible)
         info (merge (dissoc (dissoc info :anonymous) :visible)
                     { :children (retrieve-set (con message-id :children))
-                      :upvotes (retrieve-set (con message-id :upvotes)) })]
-    (when (Boolean/valueOf visible) info)))
+                     :upvotes (retrieve-set (con message-id :upvotes)) })]
+    (when (Boolean/valueOf visible) 
+      (success info))))
 
 (defn message-update
   "Update message content or visibility"
@@ -48,12 +49,16 @@
     (let [to-store {:message message
                     :visible visible
                     :updated (get-current-time)}]
-      (doseq [[k v] to-store]
-        (when (not (= nil v))
-          (persist :messages (con message-id k) v))))))
+      (do
+        (doseq [[k v] to-store]
+          (when (not (= nil v))
+            (persist :messages (con message-id k) v)))
+        (success true)))))
 
 (defn message-upvote
   "Upvotes the message"
   [message-id user-id auth-token]
   (when (authorized? user-id auth-token) 
-    (add-to-set (con message-id :upvotes) user-id)))
+    (do
+      (add-to-set (con message-id :upvotes) user-id)
+      (success true))))
