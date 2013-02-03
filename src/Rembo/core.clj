@@ -16,10 +16,13 @@
         salt (get-setting :salt)]
     (digest/md5 (str password salt))))
 
-(defn authorized?
-  "Checks the correctness of given session token"
-  [user-id auth-token]
-  (= auth-token (get-session user-id)))
+(defmacro if-authorized?
+  "Checks the correctness of given session token and 
+  executes action or throws an error"
+  [user-id auth-token action]
+  `(if (= ~auth-token (get-session ~user-id))
+     ~action
+     (error "unauthorized access")))
 
 (defn next-id
   "Generates next id by incrementation"
@@ -28,8 +31,9 @@
 
 (defn success
   "Return result when successful execution"
-  [result]
-  {:status :ok :result result})
+  ([] {:status :ok})
+  ([result]
+   (assoc (success) :result result)))
 
 (defn error
   "Return error when failed execution"

@@ -41,20 +41,20 @@
 (defn user-update
   "Update user info"
   [user-id auth-token {:keys [name password about email]}]
-  (when (authorized? user-id auth-token)
-          ;hash passwd if it's gonna change
-    (let [password (when password (digest/md5 password)) 
-          to-store {:name name :password password :about about :email email}]
-      (do
-        ; when a name will be changed, adjust the name->id mapping as well!
-        (when (to-store :name)
-          (do 
-            (delete :name2id ((user-retrieve user-id) :name))
-            (persist :name2id name user-id)))
-        (doseq [[k v] to-store]
-          (when v
-            (persist :users (con user-id k) v)))
-        (success true)))))
+  (if-authorized? user-id auth-token
+                  ;hash passwd if it's gonna change
+                  (let [password (when password (digest/md5 password)) 
+                        to-store {:name name :password password :about about :email email}]
+                    (do
+                      ; when a name will be changed, adjust the name->id mapping as well!
+                      (when (to-store :name)
+                        (do 
+                          (delete :name2id ((user-retrieve user-id) :name))
+                          (persist :name2id name user-id)))
+                      (doseq [[k v] to-store]
+                        (when v
+                          (persist :users (con user-id k) v)))
+                      (success)))))
 
 (defn user-meta-retrieve
   "Retrieves information about the user"

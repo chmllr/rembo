@@ -37,7 +37,7 @@
                   (is (= "chr@is.com" (user :email)))
                   (user-update user-id auth {:password "lalala" :name "mllr"})
                   (is (= "mllr" ((:result (user-retrieve user-id)) :name)))
-                  (user-update user-id auth {:name "chris"})
+                  (is (= :failed (:status (user-update user-id auth {:name "chris"}))))
                   (isnot (= "chris" ((:result (user-retrieve user-id)) :name)))
                   (def auth (:auth-token (:result (user-authenticate "mllr" "lalala"))))
                   (isnot (= nil auth))

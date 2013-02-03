@@ -8,22 +8,22 @@
 (defn message-create
   "Creates a new message"
   [user-id auth-token message parent-message-id anonymous]
-  (when (authorized? user-id auth-token)
-    (let [message-id (next-id (retrieve :last-message-id))
-          created (get-current-time)
-          to-store {:message message 
-                    :created created
-                    :updated created
-                    :author (str user-id)
-                    :parent parent-message-id
-                    :visible true
-                    :anonymous anonymous}]
-      (do
-        (persist :last-message-id message-id)
-        (add-to-set (con parent-message-id :children) message-id)
-        (doseq [[k v] to-store]
-          (persist :messages (con message-id k) v))
-        (success message-id)))))
+  (if-authorized? user-id auth-token
+                  (let [message-id (next-id (retrieve :last-message-id))
+                        created (get-current-time)
+                        to-store {:message message 
+                                  :created created
+                                  :updated created
+                                  :author (str user-id)
+                                  :parent parent-message-id
+                                  :visible true
+                                  :anonymous anonymous}]
+                    (do
+                      (persist :last-message-id message-id)
+                      (add-to-set (con parent-message-id :children) message-id)
+                      (doseq [[k v] to-store]
+                        (persist :messages (con message-id k) v))
+                      (success message-id)))))
 
 (defn message-retrieve
   "Retrieves message infromation"
@@ -45,20 +45,20 @@
 (defn message-update
   "Update message content or visibility"
   [message-id user-id auth-token {:keys [message visible]}]
-  (when (authorized? user-id auth-token)
-    (let [to-store {:message message
-                    :visible visible
-                    :updated (get-current-time)}]
-      (do
-        (doseq [[k v] to-store]
-          (when (not (= nil v))
-            (persist :messages (con message-id k) v)))
-        (success true)))))
+  (if-authorized? user-id auth-token
+                  (let [to-store {:message message
+                                  :visible visible
+                                  :updated (get-current-time)}]
+                    (do
+                      (doseq [[k v] to-store]
+                        (when (not (= nil v))
+                          (persist :messages (con message-id k) v)))
+                      (success)))))
 
 (defn message-upvote
   "Upvotes the message"
   [message-id user-id auth-token]
-  (when (authorized? user-id auth-token) 
-    (do
-      (add-to-set (con message-id :upvotes) user-id)
-      (success true))))
+  (if-authorized? user-id auth-token
+                  (do
+                    (add-to-set (con message-id :upvotes) user-id)
+                    (success))))
