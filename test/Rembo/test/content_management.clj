@@ -1,9 +1,9 @@
-(ns Rembo.test.content-management
-  (:use [Rembo.content-management]
-        [Rembo.user-management]
-        [Rembo.persistence]
-        [Rembo.test.core]
-        [Rembo.core]
+(ns rembo.test.content-management
+  (:use [rembo.content-management]
+        [rembo.user-management]
+        [rembo.persistence]
+        [rembo.test.core]
+        [rembo.core]
         [clojure.set]
         [clojure.test]))
 

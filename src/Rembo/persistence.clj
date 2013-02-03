@@ -1,4 +1,4 @@
-(ns Rembo.persistence
+(ns rembo.persistence
   (:use [settingator.core])
   (:require [clj-redis.client :as redis]))
 

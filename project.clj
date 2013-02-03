@@ -1,4 +1,4 @@
-(defproject Rembo "1.0.0-SNAPSHOT"
+(defproject rembo "1.0.0"
             :description "Rembo: Recursive Message Board"
             :dependencies [[org.clojure/clojure "1.4.0"]
                            [cheshire "5.0.1"]

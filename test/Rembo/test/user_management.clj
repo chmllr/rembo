@@ -1,7 +1,7 @@
-(ns Rembo.test.user-management
-  (:use [Rembo.user-management]
-        [Rembo.persistence]
-        [Rembo.test.core]
+(ns rembo.test.user-management
+  (:use [rembo.user-management]
+        [rembo.persistence]
+        [rembo.test.core]
         [clojure.test]))
 
 (use-fixtures :once clean-database-fixture)

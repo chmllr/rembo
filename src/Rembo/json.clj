@@ -1,5 +1,5 @@
-(ns Rembo.json
-  (:use [Rembo.core])
+(ns rembo.json
+  (:use [rembo.core])
   (:require [cheshire.core :refer :all]))
 
 (defn traverse

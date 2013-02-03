@@ -1,7 +1,7 @@
-(ns Rembo.core
+(ns rembo.core
   (:require [digest]
             [cheshire.core :refer :all])
-  (:use [Rembo.persistence]
+  (:use [rembo.persistence]
         [settingator.core]))
 
 (defn con

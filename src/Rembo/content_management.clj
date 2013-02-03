@@ -1,6 +1,6 @@
-(ns Rembo.content-management
-  (:use [Rembo.core]
-        [Rembo.persistence]))
+(ns rembo.content-management
+  (:use [rembo.core]
+        [rembo.persistence]))
 
 (defn- get-current-time []
   (int (/ (System/currentTimeMillis) 1000)))

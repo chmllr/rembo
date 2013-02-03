@@ -1,6 +1,6 @@
-(ns Rembo.test.json
+(ns rembo.test.json
   (:use [clojure.test]
-        [Rembo.json]))
+        [rembo.json]))
 
 (deftest jsonification
          (testing "json wrap and unwrap"

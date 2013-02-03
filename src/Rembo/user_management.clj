@@ -1,7 +1,7 @@
-(ns Rembo.user-management
+(ns rembo.user-management
   (:require [digest])
-  (:use [Rembo.core]
-        [Rembo.persistence]))
+  (:use [rembo.core]
+        [rembo.persistence]))
 
 (defn user-create
   "Creates a new user"
