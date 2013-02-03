@@ -2,7 +2,7 @@
   (:require [digest]
             [cheshire.core :refer :all])
   (:use [Rembo.persistence]
-        [Rembo.settings]))
+        [settingator.core]))
 
 (defn con
   "Concatenation helper"

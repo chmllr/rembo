@@ -1,5 +1,5 @@
 (ns Rembo.persistence
-  (:use [Rembo.settings])
+  (:use [settingator.core])
   (:require [clj-redis.client :as redis]))
 
 ; Initialize the data base 
