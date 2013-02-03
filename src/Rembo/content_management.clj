@@ -35,11 +35,10 @@
                 :anonymous])
         info (if (Boolean/valueOf (info :anonymous)) 
                (dissoc info :author) info)
-        info (dissoc info :anonymous)
         visible (info :visible)
-        info (dissoc info :visible)
-        info (assoc info :children (retrieve-set (con message-id :children)))
-        info (assoc info :upvotes (retrieve-set (con message-id :upvotes)))]
+        info (merge (dissoc (dissoc info :anonymous) :visible)
+                    { :children (retrieve-set (con message-id :children))
+                      :upvotes (retrieve-set (con message-id :upvotes)) })]
     (when (Boolean/valueOf visible) info)))
 
 (defn message-update
