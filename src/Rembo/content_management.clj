@@ -39,7 +39,7 @@
           visible (info :visible)
           info (merge (dissoc (dissoc info :anonymous) :visible)
                       { :children (retrieve-set (con message-id :children))
-                       :upvotes (retrieve-set (con message-id :upvotes)) })]
+                        :upvotes (retrieve-set (con message-id :upvotes))})]
       (if (Boolean/valueOf visible) 
         (success info)
         (error "message is hidden")))
