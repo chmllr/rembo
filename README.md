@@ -1,44 +1,43 @@
-
-= Rembo: Recursive Message Board =
+# Rembo: Recursive Message Board
 
 Rembo is a core engine providing a simple recursive message board.
-It is completely decoupled from the presentation layer (apps, web, etc.) and provides solely an [[API]].
+It is completely decoupled from the presentation layer (apps, web, etc.) and provides solely an API (see below).
 
-== Idea ==
+## The Idea
 
-The idea is extremely simple: every message represents a post and a comment simultaneously.
+The idea is very simple: every message represents a post and a comment simultaneously.
 
-# High level messages are comments of special root posts (many roots can exist).
-# The comments of every message are post themselves (and can have comments).
+- High level messages are comments of special root posts (many roots can exist).
+- The comments of every message are post themselves (and can have comments).
 
 Hence, every comment to a comment of some post is a comment of a post too.
 This idea aims to be orthogonal to the hierarchical representation of comments.
 
-== Content management ==
+## Content management
 
 Messages can be:
 
-# created
-# edited (this will be noticed in the message state forever)
-# upvoted
+- created
+- edited (this will be noticed in the message state forever)
+- upvoted
 
-== User management ==
+## User management
 
 User management is handled by the Rembo core and supports:
 
-# authorization
-# authentication
-# user info changes
+- authorization
+- authentication
+- user info changes
 
 User can post pseudo-anonymously (with name hidden from other users).
 
 User's karma is computed from the upvotes of all his posts.
 
-== Persistence ==
+## Persistence
 
 The persistence layer is build into Rembo and uses redis store.
 
-=== Schema ===
+### Schema
 
 | Key             | Hierarchy Key | Type   | Meaning                                 |
 |-----------------|---------------|--------|-----------------------------------------|
@@ -59,64 +58,64 @@ The persistence layer is build into Rembo and uses redis store.
 | <id>:upvotes    |               | set    | user ID's who upvoted                   |
 | <user_name>     | name2id       | int    | maps user names to IDs                  |
 
-== Rembo API ==
+## Rembo API
 
-== User Management ==
+### User Management
 
-=== User Creation ===
+#### User Creation
 
-# Function: `user-create`
-# Input: `{'name': <name>, 'password': <password>, 'about': <about>, 'email': <email>}`
+- Function: `user-create`
+- Input: `{'name': <name>, 'password': <password>, 'about': <about>, 'email': <email>}`
 
-=== User Authentication ===
+#### User Authentication
 
-# Function: `user-authenticate`
-# Input: `{'name': <name>, 'password': <password>}`
-# Output: `{'user-id': <id>, 'auth-token': <token>}`
+- Function: `user-authenticate`
+- Input: `{'name': <name>, 'password': <password>}`
+- Output: `{'user-id': <id>, 'auth-token': <token>}`
 
-=== User Update ===
+#### User Update
 
-# Function: `user-update`
-# Input: `{'user-id': <user-id>, 'auth-token': <token>, <field>: <content>}`
+- Function: `user-update`
+- Input: `{'user-id': <user-id>, 'auth-token': <token>, <field>: <content>}`
 
 The `<field>` can be `name`, `email`, `about`, `password`.
 Several fields can be specified simultaneosly.
 
-=== User Retrieval ===
+#### User Retrieval
 
-# Function: `user-retrieve`
-# Input: `{'user-id': <user-id>}`
-# Output: `{'name': <name>, 'about': <about>, 'email': <email>}`
+- Function: `user-retrieve`
+- Input: `{'user-id': <user-id>}`
+- Output: `{'name': <name>, 'about': <about>, 'email': <email>}`
 
-=== User Meta-Information Retrieval ===
+#### User Meta-Information Retrieval
 
-# Function: `user-meta-retrieve`
-# Input: `{'user-id': <user-id>}`
-# Output: `{'posts': [node IDs], 'upvotes': [node IDs]}`
+- Function: `user-meta-retrieve`
+- Input: `{'user-id': <user-id>}`
+- Output: `{'posts': [node IDs], 'upvotes': [node IDs]}`
 
 The meta information represents an information which is expensive to retrieve and will be derived from other informations.
 
-== Content Management ==
+### Content Management
 
-=== Message Creation ===
+#### Message Creation
 
-# Function: `message-create`
-# Input: `{'user-id': <user-id>, 'auth-token': <token>, 'message': <message>, 'parent': <node-id>, 'anonymously': <bool>}`
+- Function: `message-create`
+- Input: `{'user-id': <user-id>, 'auth-token': <token>, 'message': <message>, 'parent': <node-id>, 'anonymously': <bool>}`
 
-=== Message Update ===
+#### Message Update
 
-# Function: `message-update`
-# Input: `{'user-id': <user-id>, 'auth-token': <token>, 'node-id': <node-id>, 'message': <message>}`
+- Function: `message-update`
+- Input: `{'user-id': <user-id>, 'auth-token': <token>, 'node-id': <node-id>, 'message': <message>}`
 
-=== Message Upvote ===
+#### Message Upvote
 
-# Function: `message-upvote`
-# Input: `{'user-id': <user-id>, 'auth-token': <token>, 'node-id': <node-id>}`
+- Function: `message-upvote`
+- Input: `{'user-id': <user-id>, 'auth-token': <token>, 'node-id': <node-id>}`
 
-=== Message Retrieval ===
+#### Message Retrieval
 
-# Function: `message-retrieve`
-# Input: `{'node-id': <node-id>}`
-# Output `{'message': <message>, 'parent': <node ID>, 'children': [node IDs], 'upvotes': [user IDs], 'created': <date>, 'updated': <date>, 'author': <user-id>}`
+- Function: `message-retrieve`
+- Input: `{'node-id': <node-id>}`
+- Output `{'message': <message>, 'parent': <node ID>, 'children': [node IDs], 'upvotes': [user IDs], 'created': <date>, 'updated': <date>, 'author': <user-id>}`
 
 Note that the `author` might be missing in case when the post was made anonymously.
